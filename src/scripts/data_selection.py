@@ -11,9 +11,14 @@ locations = {
 
 collected = []
 
+
 with open(filepath, 'r') as f:
+
 	reader = csv.reader(f)
-	for row in reader:
+	collected.append(f.readline().split(',')) # append the dates, header row
+	
+	# search for the cities specified in the locations dictionary
+	for row in reader: 
 		try:
 			if locations[row[6]] and locations[row[6]].index(row[5]) != -1:
 				print(row[5])
@@ -21,8 +26,9 @@ with open(filepath, 'r') as f:
 		except:
 			pass
 
+# write to the output file with collected data
 with open("../../data/selected_cities.csv", "w", newline='') as f:
     writer = csv.writer(f)
     writer.writerows(collected)
 
-# print(collected)
+#print(collected)
