@@ -3,7 +3,10 @@ import csv
 
 # FIPS is a code for US cities, our selected city keys are in here
 fips_dict = {	
-				"24" : "Maryland"
+				"11" : "D.C.",
+				"44" : "Rhode Island",
+				"24" : "Maryland",
+				"51" : "Virginia",
 			}
 
 base_dir = "../../data/csse_covid_19_daily_reports_us"
