@@ -3,8 +3,14 @@ title: "Final_Project_Script"
 output: html_document
 ---
 
-```{r open csvs, }
+```{r open csvs }
 library(dplyr)
+
+
+
+# Created 4 dataframes from each of the CSV datasets. No need to have files 
+# saved in specific location, due to the way the datasets were pulled.
+
 active_cases <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/active.csv")
 recovery_total <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/cumulative_recoved_total.csv")
 cumulative_recovery_rate <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/cumulative_recovery_rate.csv")
@@ -17,6 +23,9 @@ recovery_proportion <- read.csv("https://raw.githubusercontent.com/Genes1/stat40
 
 
 ```{r drop id}
+
+# Dropped unneccesary id column (the first columns in the dataframe). 
+# Dataframes row indexed correctly. 
 active_cases_drop_first <- select(active_cases,2:232)
 recovery_total_drop_first <- select(recovery_total,2:232)
 cumulative_recovery_drop_first <- select(cumulative_recovery_rate,2:232)
@@ -26,8 +35,16 @@ recovery_proportion_drop_first <- select(recovery_proportion, 2:232)
 
 
 ``` {r fix dates}
+
+
+# Date format will be YYYY-MM-DD. 
 replace_to_date <- seq(as.Date("2020/12/03"), by = "day", length.out = 231)
 
+# Workaround to get date column names to be saved as actual dates. 
+# Since all column names will be replaced with dates, first column is the date 
+# before the first data exploration date (first actual date is 12/04/2020).
+# Pipelined the column name at the first rows of each dataframe to be 
+# "State" instead of an unnecessary date.
 
 final_active_cases <- setNames(active_cases_drop_first, replace_to_date) %>% rename(State = '2020-12-03')
 final_recovery_total <- setNames(recovery_total_drop_first, replace_to_date) %>% rename(State = '2020-12-03')
@@ -37,6 +54,10 @@ final_recovery_proportion <- setNames(recovery_proportion_drop_first, replace_to
 ```
 
 ``` {r check NA}
+
+# Ensured no possibility of NA data points influencing further data 
+# collection/manipulation.
+
 final_active_cases <- final_active_cases[complete.cases(final_active_cases), ]
 final_recovery_total <- final_recovery_total[complete.cases(final_recovery_total), ]
 final_cumulative_recovery <- final_cumulative_recovery[complete.cases(final_cumulative_recovery), ]
@@ -47,6 +68,8 @@ final_recovery_proportion <- final_recovery_proportion[complete.cases(final_reco
 
 
 ``` {r return/display dfs}
+
+# Displayed all dataframes
 
 final_active_cases
 final_recovery_total
