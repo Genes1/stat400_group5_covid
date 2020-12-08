@@ -11,7 +11,7 @@ fips_dict = {
 
 base_dir = "../../data/csse_covid_19_daily_reports_us"
 start_date = date(2020, 4, 12) 
-end_date = date(2020, 11, 27)
+end_date = date.today() - timedelta(1)
 
 # create a max-length list for each city, we can cut them down later
 day_count = (end_date - start_date).days + 1
