@@ -23,8 +23,14 @@ library(ggplot2)
 
 
  transpose_and_rename <- function(df){
+   
+   # transpose the data, so that making visuals is easier
   df <- as.data.frame(t(df))
+  
+  # make the states the column names
   names(df) <- df %>% slice(1) %>% unlist()
+  
+  # slice off the first row, where the state names were
   df <- df %>% slice(-1)
   df$RI <- as.numeric(df$RI)
   df$MD <- as.numeric(df$MD)
@@ -82,11 +88,39 @@ recovery_proportion
 r <- data.matrix(active_cases)
 
 
+# cumulative recovery rate
 
-ggplot(data=cumulative_recovery_rate, aes(x=rownames(cumulative_recovery_rate), y=RI)) +
-  geom_point( size=1, fill="black") + 
-  scale_y_continuous(limits = c(0, 1))
-  # not exactly sure this is right...
+ggplot(data=cumulative_recovery_rate, aes(x=rownames(cumulative_recovery_rate), y=RI, group=1)) +
+  scale_y_continuous(limits = c(0, 1)) +
+  geom_line(color="red") +
+  ggtitle("Cumulative Recovery Rate") + 
+  ylab("") + 
+  xlab("") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_line(data=cumulative_recovery_rate, aes(x=rownames(cumulative_recovery_rate), y=VA, group=2), colour="#0000FF") +
+  geom_line(data=cumulative_recovery_rate, aes(x=rownames(cumulative_recovery_rate), y=MD, group=3), colour="#00FF00") +
+  geom_line(data=cumulative_recovery_rate, aes(x=rownames(cumulative_recovery_rate), y=DC, group=4), colour="#FF00FF")
+
+
+
+# proportional recovery rate
+
+ggplot(data=recovery_proportion, aes(x=rownames(recovery_proportion), y=RI, group=1)) +
+  scale_y_continuous(limits = c(0, 0.1)) +
+  geom_line(color="red") +
+  ggtitle("Daily Recovery Proportion") + 
+  ylab("") + 
+  xlab("") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_line(data=recovery_proportion, aes(x=rownames(recovery_proportion), y=VA, group=2), colour="#0000FF") +
+  geom_line(data=recovery_proportion, aes(x=rownames(recovery_proportion), y=MD, group=3), colour="#00FF00") +
+  geom_line(data=recovery_proportion, aes(x=rownames(recovery_proportion), y=DC, group=4), colour="#FF00FF")
+
+
+
+
+
+  
 ```
 
 
