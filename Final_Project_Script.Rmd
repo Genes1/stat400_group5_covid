@@ -1,6 +1,7 @@
 ---
 title: "Final_Project_Script"
 output: html_document
+author: "STAT400 Group #5"
 ---
 
 ```{r open csvs }
@@ -10,13 +11,18 @@ library(dplyr)
 
 # Created 4 dataframes from each of the CSV datasets. No need to have files 
 # saved in specific location, due to the way the datasets were pulled.
+# @Daniel not sure if pulling data from specific remote URL is good idea :v
+# made path relative, do you agree?
 
-active_cases <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/active.csv")
-recovery_total <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/cumulative_recoved_total.csv")
-cumulative_recovery_rate <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/cumulative_recovery_rate.csv")
+#active_cases <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/active.csv")
+#recovery_total <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/cumulative_recoved_total.csv")
+#cumulative_recovery_rate <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/cumulative_recovery_rate.csv")
+#recovery_proportion <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/daily_recovery_proportion.csv")
 
-recovery_proportion <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/daily_recovery_proportion.csv")
-
+active_cases <- read.csv("data/selected/active.csv")
+recovery_total <- read.csv("data/selected/cumulative_recoved_total.csv")
+cumulative_recovery_rate <- read.csv("data/selected/cumulative_recovery_rate.csv")
+recovery_proportion <- read.csv("data/selected/daily_recovery_proportion.csv")
 
 ```
 
@@ -24,12 +30,14 @@ recovery_proportion <- read.csv("https://raw.githubusercontent.com/Genes1/stat40
 
 ```{r drop id}
 
-# Dropped unneccesary id column (the first columns in the dataframe). 
-# Dataframes row indexed correctly. 
-active_cases_drop_first <- select(active_cases,2:232)
-recovery_total_drop_first <- select(recovery_total,2:232)
-cumulative_recovery_drop_first <- select(cumulative_recovery_rate,2:232)
-recovery_proportion_drop_first <- select(recovery_proportion, 2:232)
+# Drop unneccesary FIPS id column (the first columns in the dataframe). 
+# @Daniel, I think this is cleaner. Correct me if I'm wrong :^)
+
+active_cases <- active_cases[,-1]
+recovery_total <- recovery_total[,-1]
+cumulative_recovery_rate <- cumulative_recovery_rate[,-1]
+recovery_proportion <- recovery_proportion[,-1]
+
 
 ```
 
@@ -37,19 +45,25 @@ recovery_proportion_drop_first <- select(recovery_proportion, 2:232)
 ``` {r fix dates}
 
 
-# Date format will be YYYY-MM-DD. 
-replace_to_date <- seq(as.Date("2020/12/03"), by = "day", length.out = 231)
+# Date format will be MM-DD-YYYY. 
+replace_to_date <- format(seq(as.Date("2020/04/11"), by = "day", length.out = ncol(active_cases)), 
+                          # possible date formatting changes:
+                          # https://www.statmethods.net/input/dates.html
+                          # "%B %d" -> April 3
+                          # "%m/%d" -> 04/03
+                          # kept like 04/03/2020 for now
+                          format = "%m/%d/%Y")
 
 # Workaround to get date column names to be saved as actual dates. 
 # Since all column names will be replaced with dates, first column is the date 
-# before the first data exploration date (first actual date is 12/04/2020).
-# Pipelined the column name at the first rows of each dataframe to be 
+# before the first data exploration date (first actual date is 4/12/2020).
+# Pipelined the column name at the first column of each dataframe to be 
 # "State" instead of an unnecessary date.
 
-final_active_cases <- setNames(active_cases_drop_first, replace_to_date) %>% rename(State = '2020-12-03')
-final_recovery_total <- setNames(recovery_total_drop_first, replace_to_date) %>% rename(State = '2020-12-03')
-final_cumulative_recovery <- setNames(cumulative_recovery_drop_first, replace_to_date) %>% rename(State = '2020-12-03')
-final_recovery_proportion <- setNames(recovery_proportion_drop_first, replace_to_date) %>% rename(State = '2020-12-03')
+active_cases <- setNames(active_cases, replace_to_date) %>% rename(State = '04/11/2020')
+recovery_total <- setNames(recovery_total, replace_to_date) %>% rename(State = '04/11/2020')
+cumulative_recovery_rate <- setNames(cumulative_recovery_rate, replace_to_date) %>% rename(State = '04/11/2020')
+recovery_proportion <- setNames(recovery_proportion, replace_to_date) %>% rename(State = '04/11/2020')
 
 ```
 
@@ -58,10 +72,10 @@ final_recovery_proportion <- setNames(recovery_proportion_drop_first, replace_to
 # Ensured no possibility of NA data points influencing further data 
 # collection/manipulation.
 
-final_active_cases <- final_active_cases[complete.cases(final_active_cases), ]
-final_recovery_total <- final_recovery_total[complete.cases(final_recovery_total), ]
-final_cumulative_recovery <- final_cumulative_recovery[complete.cases(final_cumulative_recovery), ]
-final_recovery_proportion <- final_recovery_proportion[complete.cases(final_recovery_proportion), ]
+active_cases <- active_cases[complete.cases(active_cases), ]
+recovery_total <- recovery_total[complete.cases(recovery_total), ]
+cumulative_recovery_rate <- cumulative_recovery_rate[complete.cases(cumulative_recovery_rate), ]
+recovery_proportion <- recovery_proportion[complete.cases(recovery_proportion), ]
 
 
 ```
@@ -71,9 +85,9 @@ final_recovery_proportion <- final_recovery_proportion[complete.cases(final_reco
 
 # Displayed all dataframes
 
-final_active_cases
-final_recovery_total
-final_cumulative_recovery
-final_recovery_proportion
+active_cases
+recovery_total
+cumulative_recovery_rate
+recovery_proportion
 
 ```
