@@ -9,6 +9,13 @@ fips_dict = {
 				"51" : "Virginia",
 			}
 
+abbrev = {
+				"D.C." : "DC",
+				"Rhode Island" : "RI",
+				"Virginia" : "VA",
+				"Maryland" : "MD",	
+}
+
 base_dir = "../../data/csse_covid_19_daily_reports_us"
 start_date = date(2020, 4, 12) 
 end_date = date.today() - timedelta(1)
@@ -103,8 +110,7 @@ file_dict = {
 }
 
 header = [(start_date + timedelta(n)).strftime("%m/%d/%Y") for n in range(day_count)] 
-header.insert(0, "State")
-header.insert(0, "FIPS")
+header.insert(0, "Date")
 
 for index_key in file_dict.keys():
 	with open(file_dict[index_key], 'w', newline='') as f:
@@ -113,9 +119,8 @@ for index_key in file_dict.keys():
 		writer.writerow(header)
 		for fips_key in cumulative:
 			sub = [daily_vals[index_key] for daily_vals in cumulative[fips_key]]
-			name = fips_dict[fips_key]
+			name = abbrev[fips_dict[fips_key]]
 			sub.insert(0, name)		# state
-			sub.insert(0, fips_key)	# fips
 			writer.writerow(sub)
 
 

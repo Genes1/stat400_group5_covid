@@ -1,0 +1,90 @@
+---
+title: "Final_Project_Script"
+output: html_document
+author: "STAT400 Group #5"
+---
+
+```{r open csvs }
+library(dplyr)
+# install.packages("ggplot2") if you are missing it
+library(ggplot2)
+
+
+
+# Created 4 dataframes from each of the CSV datasets. No need to have files 
+# saved in specific location, due to the way the datasets were pulled.
+# @Daniel not sure if pulling data from specific remote URL is good idea :v
+# made path relative, do you agree?
+
+#active_cases <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/active.csv")
+#recovery_total <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/cumulative_recoved_total.csv")
+#cumulative_recovery_rate <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/cumulative_recovery_rate.csv")
+#recovery_proportion <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/daily_recovery_proportion.csv")
+
+
+ transpose_and_rename <- function(df){
+  df <- as.data.frame(t(df))
+  names(df) <- df %>% slice(1) %>% unlist()
+  df <- df %>% slice(-1)
+  return(df)
+}
+
+active_cases <- read.csv("../data/selected/active.csv")
+active_cases <- transpose_and_rename(active_cases)
+#active_cases <- as.data.frame(t(active_cases))
+#names(active_cases) <- active_cases %>% slice(1) %>% unlist()
+#active_cases <- active_cases %>% slice(-1)
+
+recovery_total <- read.csv("../data/selected/cumulative_recoved_total.csv")
+recovery_total <- transpose_and_rename(recovery_total)
+
+cumulative_recovery_rate <- read.csv("../data/selected/cumulative_recovery_rate.csv")
+cumulative_recovery_rate <- transpose_and_rename(cumulative_recovery_rate)
+
+recovery_proportion <- read.csv("../data/selected/daily_recovery_proportion.csv")
+recovery_proportion <- transpose_and_rename(recovery_proportion)
+
+```
+
+
+``` {r check NA}
+
+# Ensured no possibility of NA data points influencing further data 
+# collection/manipulation.
+
+active_cases <- active_cases[complete.cases(active_cases), ]
+recovery_total <- recovery_total[complete.cases(recovery_total), ]
+cumulative_recovery_rate <- cumulative_recovery_rate[complete.cases(cumulative_recovery_rate), ]
+recovery_proportion <- recovery_proportion[complete.cases(recovery_proportion), ]
+
+
+```
+
+
+``` {r return/display dfs}
+
+# Displayed all dataframes
+
+active_cases
+recovery_total
+cumulative_recovery_rate
+recovery_proportion
+
+```
+
+``` {r daily proportion plot}
+ggplot(data=cumulative_recovery_rate, aes(x=rownames(cumulative_recovery_rate), y=RI)) +
+  geom_point( size=1, fill="black") + 
+  scale_y_discrete(breaks = seq(0, 100, by = 10))
+  # not exactly sure this is right...
+```
+
+
+
+
+
+
+
+
+
+
