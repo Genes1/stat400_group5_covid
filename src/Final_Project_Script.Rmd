@@ -26,6 +26,11 @@ library(ggplot2)
   df <- as.data.frame(t(df))
   names(df) <- df %>% slice(1) %>% unlist()
   df <- df %>% slice(-1)
+  df$RI <- as.numeric(df$RI)
+  df$MD <- as.numeric(df$MD)
+  df$VA <- as.numeric(df$VA)
+  df$DC <- as.numeric(df$DC)
+
   return(df)
 }
 
@@ -73,9 +78,14 @@ recovery_proportion
 ```
 
 ``` {r daily proportion plot}
+
+r <- data.matrix(active_cases)
+
+
+
 ggplot(data=cumulative_recovery_rate, aes(x=rownames(cumulative_recovery_rate), y=RI)) +
   geom_point( size=1, fill="black") + 
-  scale_y_discrete(breaks = seq(0, 100, by = 10))
+  scale_y_continuous(limits = c(0, 1))
   # not exactly sure this is right...
 ```
 
