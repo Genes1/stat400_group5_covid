@@ -1,8 +1,20 @@
 ---
 title: "Final_Project_Script"
 output: html_document
-author: "STAT400 Group #5"
+author: "<u>STAT400 Group #5:</u> Eugene Domrachev, Asher Eisen, Benjamin Cai, Urvi Chowdhury, Sebastian Gutierrez, Karn Randhawa, Keonwoo Kim, Daniel Zafman, Sahil Sinha, Ashish Dasu, Edward Du, Alex Mitin Ben Snyder, Brian Ndofor"
 ---
+
+<h2> OBJECTIVE: </h2>
+
+<h3><i>How does the population density and economic status of a state affect the COVID recovery rate?</i></h3>
+
+
+<h2> HYPOTHESIS: </h2>
+
+1. We expect that the higher the population density in a region, the lower the recovery rate will be. 
+2. We expect that the higher the economic status is in a region, the higher the recovery rate will be.
+
+
 
 ```{r open csvs }
 library(dplyr)
@@ -11,18 +23,9 @@ library(ggplot2)
 
 
 
-# Created 4 dataframes from each of the CSV datasets. No need to have files 
-# saved in specific location, due to the way the datasets were pulled.
-# @Daniel not sure if pulling data from specific remote URL is good idea :v
-# made path relative, do you agree?
+# rework the data to an easily plottable format
 
-#active_cases <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/active.csv")
-#recovery_total <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/cumulative_recoved_total.csv")
-#cumulative_recovery_rate <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/cumulative_recovery_rate.csv")
-#recovery_proportion <- read.csv("https://raw.githubusercontent.com/Genes1/stat400_group5_covid/master/data/selected/daily_recovery_proportion.csv")
-
-
- transpose_and_rename <- function(df){
+transpose_and_rename <- function(df){
    
    # transpose the data, so that making visuals is easier
   df <- as.data.frame(t(df))
@@ -30,21 +33,23 @@ library(ggplot2)
   # make the states the column names
   names(df) <- df %>% slice(1) %>% unlist()
   
-  # slice off the first row, where the state names were
+  # slice off the first row, where the state names were (they are labels, and should not be processed with other data)
   df <- df %>% slice(-1)
+  
+  # convert columns to numeric data, instead of factor
   df$RI <- as.numeric(df$RI)
   df$MD <- as.numeric(df$MD)
   df$VA <- as.numeric(df$VA)
   df$DC <- as.numeric(df$DC)
-
+  
   return(df)
+  
 }
+ 
+ 
 
 active_cases <- read.csv("../data/selected/active.csv")
 active_cases <- transpose_and_rename(active_cases)
-#active_cases <- as.data.frame(t(active_cases))
-#names(active_cases) <- active_cases %>% slice(1) %>% unlist()
-#active_cases <- active_cases %>% slice(-1)
 
 recovery_total <- read.csv("../data/selected/cumulative_recoved_total.csv")
 recovery_total <- transpose_and_rename(recovery_total)
@@ -76,30 +81,22 @@ recovery_proportion <- recovery_proportion[complete.cases(recovery_proportion), 
 
 # Displayed all dataframes
 
-active_cases
-recovery_total
-cumulative_recovery_rate
-recovery_proportion
+head(active_cases)
+head(recovery_total)
+head(cumulative_recovery_rate)
+head(recovery_proportion)
 
 ```
 
-``` {r cumulative recovery total}
+``` {r cumulative recovery rate}
 
 factored_dates <- as.factor(rownames(recovery_total))
 colors <- c(MD="#5999E3", VA="#E386C9", RI="#E3B159", DC="#77E364")
 
-# cumulative recovery rate
 
-# red - Rhode Island
-# blue - virginia
-# green - Maryland
-# pink - DC
-
-
+# ================ cumulative recovery rate ================
 
 line_size <- 1.2
-
-
 
 ggplot(data=recovery_proportion, aes(x=factored_dates, y=RI, group=1, color="RI")) +
   
@@ -147,7 +144,7 @@ ggplot(data=recovery_proportion, aes(x=factored_dates, y=RI, group=1, color="RI"
 
 
 
-
+# ================ cumulative recovery rate, without DC ================
 
 ggplot(data=recovery_proportion, aes(x=factored_dates, y=RI, group=1, color="RI")) +
   
@@ -158,7 +155,7 @@ ggplot(data=recovery_proportion, aes(x=factored_dates, y=RI, group=1, color="RI"
 
   # scales, titles, labels
   #scale_y_continuous(breaks=seq(0, 25500, 5000), limits = c(0, 25500)) +
-  scale_y_continuous(limits = c(0, 0.20)) +
+  scale_y_continuous(limits = c(0, 0.18)) +
   scale_x_discrete(breaks=c("X04.12.2020", "X05.01.2020", "X06.01.2020", 
                           "X07.01.2020", "X08.01.2020", "X09.01.2020", 
                           "X10.01.2020", "X11.01.2020", "X12.01.2020")
@@ -197,7 +194,9 @@ ggplot(data=recovery_proportion, aes(x=factored_dates, y=RI, group=1, color="RI"
 ```
 
 ``` {r daily recovery proportion}
-# proportional recovery rate
+
+
+# ================ proportional recovery rate ================
 
 line_size <- 1
 ggplot(data=recovery_proportion, aes(x=factored_dates, y=RI, group=1, color="RI")) +
@@ -247,8 +246,12 @@ ggplot(data=recovery_proportion, aes(x=factored_dates, y=RI, group=1, color="RI"
 
 
 
-# zoom in on non-DC states
 
+
+
+# ================ daily recovery proportion in non-DC states ================
+
+line_size <- 0.6
 ggplot(data=recovery_proportion, aes(x=factored_dates, y=RI, group=1, color="RI")) +
   
   #plotting the line data
@@ -298,6 +301,7 @@ ggplot(data=recovery_proportion, aes(x=factored_dates, y=RI, group=1, color="RI"
 
 ```{r cumulative recovery total}
 
+# ================ cumulative recovery totals ================
 
 line_size <- 1.2
 ggplot(data=recovery_total, aes(x=factored_dates, y=RI, group=1, color="RI")) +
@@ -346,3 +350,68 @@ ggplot(data=recovery_total, aes(x=factored_dates, y=RI, group=1, color="RI")) +
 
 
 ```
+```{r summary statistics}
+
+# ================ cumulative recovery totals ================
+
+line_size <- 1.2
+ggplot(data=recovery_total, aes(x=factored_dates, y=RI, group=1, color="RI")) +
+  
+  #plotting the line data
+  geom_line(size=line_size) +
+  geom_line(data=recovery_total, aes(x=factored_dates, y=VA, group=2, color="VA"), size=line_size) +
+  geom_line(data=recovery_total, aes(x=factored_dates, y=MD, group=3, color="MD"), size=line_size) +
+  geom_line(data=recovery_total, aes(x=factored_dates, y=DC, group=4, color="DC"), size=line_size) + 
+  
+  # scales, titles, labels
+  scale_y_continuous(breaks=seq(0, 25500, 5000), limits = c(0, 25500)) +
+  scale_x_discrete(breaks=c("X04.12.2020", "X05.01.2020", "X06.01.2020", 
+                          "X07.01.2020", "X08.01.2020", "X09.01.2020", 
+                          "X10.01.2020", "X11.01.2020", "X12.01.2020")
+                 , labels=c("April","May","June",
+                            "July", "August", "September", 
+                            "October", "November", "December")) +
+  ggtitle("Cumulative Recovery Total") + 
+  ylab("Total Recovered") + 
+  xlab("Time") +
+  
+  scale_colour_manual(values=colors)+
+  
+  # general theme
+  theme(
+        text=element_text(size=12,family="serif"),
+        plot.title = element_text(size=20, hjust = 0.5, vjust=3),
+        axis.title.x = element_text(size=16, vjust=-2, hjust = 0.47),
+        axis.title.y = element_text(size=14, vjust=5),
+        plot.margin = unit(c(0.75, 0.5, 0.75, 0.75), "cm"),
+        legend.position="right",
+        legend.title = element_blank(),
+        legend.key.size = unit(1, "cm"),
+        legend.key.width = unit(1,"cm"),
+        legend.background = element_rect(fill="transparent"),
+        legend.box.background = element_rect(fill="transparent"),
+        # change background of whole thing
+        plot.background = element_rect(fill = "#f9faf5"),
+        # change background of inner panel
+        panel.background = element_rect(fill = "#dfe7f5")
+        ) 
+  
+
+
+
+
+```
+
+<h2> CONCLUSION & FUTURE DIRECTION </h2>
+
+Daily and cumulative recovery proportions were consistent with our hypothesis about the relationship between population density and recovery rate for VA, MD, RI. We did not observe a relationship between economic status and recovery rate. 
+
+Missing data and poor quality of data caused discrepancies and negated any expected predictions for DC. This problem was echoed for a number of states during the tenure of the project, among other problems:
+<ul>
+  <li> Some states were updated inconsistently (anywhere from 3-7 days in between updates), or stopped updating </li> 
+  <li> Recovery totals were not available in some states </li> 
+  <li> Fishy numbers (like the DC jump) </li> 
+</ul>
+
+
+
